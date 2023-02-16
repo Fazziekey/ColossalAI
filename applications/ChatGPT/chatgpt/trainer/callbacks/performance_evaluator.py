@@ -66,6 +66,7 @@ class PerformanceEvaluator(Callback):
         self.learn_start_time: Optional[float] = None
         self.learn_num_samples: int = 0
         self.learn_flop: int = 0
+        self.result: dict = {}
 
     def on_episode_start(self, episode: int) -> None:
         self.disable = self.ignore_episodes > 0 and episode < self.ignore_episodes
@@ -131,3 +132,13 @@ class PerformanceEvaluator(Callback):
             f'Making experience throughput: {avg_make_experience_throughput:.3f} samples/sec, TFLOPS: {avg_make_experience_tflops:.3f}'
         )
         print_rank_0(f'Learning throughput: {avg_learn_throughput:.3f} samples/sec, TFLOPS: {avg_learn_tflops:.3f}')
+
+        self.result = {
+            'make_experience_throughput': avg_make_experience_throughput,
+            'make_experience_tflops': avg_make_experience_tflops,
+            'learn_throughput': avg_learn_throughput,
+            'learn_tflops': avg_learn_tflops
+        }
+
+    def get_result(self) -> dict:
+        return self.result
